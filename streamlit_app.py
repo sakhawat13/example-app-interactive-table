@@ -156,7 +156,7 @@ if submit:
     stockdata = compute_moving_averages(stockdata,[5])
     stockdata = stockdata.fillna(0)
     pred = model1.predict(stockdata)
-    stockdat1["Prediction"] = pred
+    stockdata1["Prediction"] = pred
     sts = stockdata1[["Date","Price","Prediction","Profit"]]
 #     st.write(stockdata)
     
