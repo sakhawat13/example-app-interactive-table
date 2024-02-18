@@ -38,6 +38,28 @@ model1 = pickle.load(open('model.pkl','rb'))
 #     model_xgb = model2
 # clf2 = pickle.load(open('classifier_w_indicator_model_reversed.sav', 'rb'))
 
+def compute_moving_averages(df, windows=[20]):
+    """
+    Compute moving averages for all columns in the DataFrame for the given window sizes.
+
+    Parameters:
+    - df: pandas.DataFrame, the input DataFrame containing the data.
+    - windows: list, a list of integers representing the window sizes for which to calculate the moving averages.
+
+    Returns:
+    - pandas.DataFrame, the original DataFrame with new columns for each moving average calculation.
+    """
+    # Loop through each column in the DataFrame
+    for column in df.columns:
+        # Check if the column data type is numeric
+        if pd.api.types.is_numeric_dtype(df[column]):
+            # Loop through each window size specified
+            for window in windows:
+                # Compute the moving average for the current column and window size
+                ma_column_name = f"{column}_MA{window}"
+                df[ma_column_name] = df[column].rolling(window=window).mean()
+    return df
+
 
 # In[4]:
 
@@ -74,7 +96,7 @@ if file is not None:
 #     st.write(bytes_data)
     
     df= pd.read_csv(file)
-    stockdata = df
+    stockdata1 = df
 #     st.write(df)
 
 # st.write(stockdata)
@@ -83,20 +105,58 @@ if file is not None:
 submit = st.button("Submit")
 st.subheader("Green = Abnormal Profit,  Blue = Players detected,     Black = Normal,   Red = Players exiting ")
 if submit:
+    stockdata = stockdata1.fillna(0)
     stockdata = stockdata[stockdata['Vol.'].notna()]
+    stockdata['Change %'] = stockdata['Change %'].str.replace('%', '', regex=True).astype(float)
+    stockdata['Change %'] = stockdata['Change %']/100
     stockdata["Vol."]=stockdata['Vol.'].replace({'K': '*1e3', 'M': '*1e6', '-':'-1'}, regex=True).map(pd.eval).astype(int)
-    stockdata = stockdata[::-1]
-    stockdata = add_all_ta_features(stockdata, open="Open", high="High", low="Low", close="Price", volume="Vol.", fillna=True)
-    stockdata["VolAvgNDays"] = stockdata["Vol."].rolling(20).mean()  
-    stockdata['Change %'] = stockdata['Change %'].str.rstrip('%').astype('float') / 100.0
-    check = stockdata.drop(["Date"],axis=1)
-    st.write(len(check.columns))
-    pred = model1.predict(check)
-    prof = model2.predict(check)
-    stockdata["Prediction"] = pred
-    stockdata["Profit"] = prof
-    stockdata = stockdata[::-1]
-    sts = stockdata[["Date","Price","Prediction","Profit"]]
+    # Ensure the correct data type for the 'Date' column
+    # data_clean['Date'] = pd.to_datetime(data_clean['Date'])
+
+    # Add all technical indicators available in the ta library
+    stockdata = add_all_ta_features(
+        stockdata,
+        open="Open", high="High", low="Low", close="Price", volume="Vol."
+    )
+    stockdata = stockdata[['Date','Price',
+     'Open',
+     'High',
+     'Low',
+     'Vol.',
+     'Change %',
+     'volume_adi',
+     'volume_obv',
+     'volume_mfi',
+     'volatility_bbm',
+     'volatility_bbh',
+     'volatility_bbl',
+     'volatility_bbw',
+     'volatility_bbp',
+     'volatility_bbhi',
+     'volatility_bbli',
+     'trend_macd_signal',
+     'trend_macd_diff',
+     'trend_sma_fast',
+     'trend_sma_slow',
+     'trend_ema_fast',
+     'trend_ema_slow',
+     'trend_ichimoku_conv',
+     'trend_ichimoku_base',
+     'trend_ichimoku_a',
+     'trend_ichimoku_b',
+     'trend_stc',
+     'trend_adx',
+     'trend_adx_pos',
+     'trend_adx_neg',
+     'momentum_rsi']]
+    stockdata= stockdata.replace([np.inf, -np.inf], 0)
+    stockdata = stockdata.fillna(0)
+    stockdata =  stockdata.drop(columns=['Date'])
+    stockdata = compute_moving_averages(stockdata,[5])
+    stockdata = stockdata.fillna(0)
+    pred = model1.predict(stockdata)
+    stockdat1a["Prediction"] = pred
+    sts = stockdata1[["Date","Price","Prediction","Profit"]]
 #     st.write(stockdata)
     
 
