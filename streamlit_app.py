@@ -29,8 +29,8 @@ from st_aggrid.shared import JsCode
 model_xgb = xgb.XGBClassifier()
 model1 = xgb.XGBClassifier()
 model2 = xgb.XGBClassifier()
-model1.load_model("model_non_profit.json")
-model2.load_model("model_profit.json")
+model1 = pickle.load(open('model.pkl','rb'))
+
 # model_xgb = model1
 # model = st.checkbox('Specialized model')
 # model_xgb.load_model("model_unspecialized.json")
