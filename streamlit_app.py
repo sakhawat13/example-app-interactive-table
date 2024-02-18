@@ -157,6 +157,8 @@ if submit:
     stockdata = stockdata.fillna(0)
     pred = model1.predict(stockdata)
     stockdata1["Prediction"] = pred
+    stockdata1["Prediction"] = stockdata1["Prediction"]-1
+    stockdata1['Prediction'] = stockdata1['Prediction'].replace(2, 1)
     sts = stockdata1[["Date","Price","Prediction"]]
 #     st.write(stockdata)
     
@@ -178,15 +180,16 @@ if submit:
         jscode = JsCode("""
                     function(params) {
                         
-                        if (params.data.Profit === 1) {
+                        if (params.data.Prediction === 1) {
                             return {
                                 'color': 'white',
                                 'backgroundColor': 'green'
                             }
                         }
-                        if (params.data.Prediction === 0) {
+                        if (params.data.Prediction === -1) {
                             return {
                                 'color': 'white',
+                                'backgroundColor': 'red'
                                 
                             }
                         }
