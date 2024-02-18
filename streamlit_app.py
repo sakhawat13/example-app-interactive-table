@@ -105,7 +105,8 @@ if file is not None:
 submit = st.button("Submit")
 st.subheader("Green = Abnormal Profit,  Blue = Players detected,     Black = Normal,   Red = Players exiting ")
 if submit:
-    stockdata = stockdata1.fillna(0)
+    stockdata = stockdata1.iloc[::-1].reset_index(drop=True)
+    stockdata = stockdata.fillna(0)
     stockdata = stockdata[stockdata['Vol.'].notna()]
     stockdata['Change %'] = stockdata['Change %'].str.replace('%', '', regex=True).astype(float)
     stockdata['Change %'] = stockdata['Change %']/100
