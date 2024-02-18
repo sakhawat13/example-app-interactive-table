@@ -7,7 +7,7 @@ investpy
 numpy
 scikit-learn
 scipy
-sklearn
+scikit-learn
 yfinance
 openpyxl
 ta
