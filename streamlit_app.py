@@ -157,7 +157,7 @@ if submit:
     stockdata = stockdata.fillna(0)
     pred = model1.predict(stockdata)
     stockdata1["Prediction"] = pred
-    sts = stockdata1[["Date","Price","Prediction","Profit"]]
+    sts = stockdata1[["Date","Price","Prediction"]]
 #     st.write(stockdata)
     
 
