@@ -47,7 +47,7 @@ def aggrid_interactive_table(df: pd.DataFrame):
 
 
 iris = pd.read_csv(
-    "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+    "sample.csv"
 )
 
 selection = aggrid_interactive_table(df=iris)
